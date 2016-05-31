@@ -1,0 +1,1 @@
+nats-akka-connector
