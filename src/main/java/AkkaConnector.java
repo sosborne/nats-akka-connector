@@ -34,6 +34,8 @@ public class AkkaConnector implements NATSConnectorPlugin
             e.printStackTrace();
             return false;
         }
+
+        system.actorOf(Props.create(AkkaSubscriber.class), "subscriber1");
         return true;
     }
 

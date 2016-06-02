@@ -11,8 +11,7 @@ public class NATSPublisher extends UntypedActor {
 
     public void onReceive(Object msg) {
         if (msg instanceof Message) {
-            mediator.tell(new DistributedPubSubMediator.Publish(
-                    "content", ((Message) msg).getData()), getSelf());
+            mediator.tell(new DistributedPubSubMediator.Publish("content", ((Message) msg).getData()), getSelf());
         } else {
             unhandled(msg);
         }
