@@ -15,6 +15,7 @@ public class AkkaConnector implements NATSConnectorPlugin
     NATSConnector connector = null;
     ActorSystem system = null;
     ActorRef publisher = null;
+    ActorRef subscriber = null;
 
     public boolean onStartup(Logger logger, ConnectionFactory connectionFactory) {
         this.logger = logger;
@@ -25,8 +26,8 @@ public class AkkaConnector implements NATSConnectorPlugin
         Config config = ConfigFactory.parseString(
                 "akka.remote.netty.tcp.port=" + 9000).withFallback(
                 ConfigFactory.load());
-        this.system = ActorSystem.create("akka-cluster", config);
-        this.publisher = system.actorOf(Props.create(NATSPublisher.class), "publisher");
+        this.system = ActorSystem.create("nats-akka", config);
+        this.publisher = system.actorOf(Props.create(NATSAkkaPublisher.class), "nats-publisher");
         try {
             connector = natsConnector;
             connector.subscribe("*");
@@ -34,8 +35,7 @@ public class AkkaConnector implements NATSConnectorPlugin
             e.printStackTrace();
             return false;
         }
-
-        system.actorOf(Props.create(AkkaSubscriber.class), "subscriber1");
+        subscriber = system.actorOf(NATSAkkaSubscriber.props(connector), "nats-subscriber");
         return true;
     }
 
@@ -48,5 +48,6 @@ public class AkkaConnector implements NATSConnectorPlugin
     }
 
     public void onShutdown() {
+        // TODO: Shut down subscriber
     }
 }
